@@ -1,10 +1,9 @@
 #include<iostream>
 #include<cstdio>
 #include<algorithm>
-#define SZY
 using namespace std;
 int main(){
-#ifdef SZY
+#ifndef ONLINE_JUDGE
 	freopen("in.txt", "r", stdin);
 	freopen("out.txt", "w", stdout);
 #endif
