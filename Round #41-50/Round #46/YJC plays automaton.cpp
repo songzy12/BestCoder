@@ -1,121 +1,123 @@
-#include<cstdio>
-#include<cstdlib>
-#include<cstring>
-#include<algorithm>
-#include<string>
-#include<iostream>
-#include<sstream>
-#include<set>
-#include<map>
-#include<queue>
-#include<bitset>
-#include<vector>
-#define SZ(X) ((int)(X).size())
-#define ALL(X) (X).begin(), (X).end()
-#define REP(I, N) for (int I = 0; I < (N); ++I)
-#define REPP(I, A, B) for (int I = (A); I < (B); ++I)
-#define RI(X) scanf("%d", &(X))
-#define RII(X, Y) scanf("%d%d", &(X), &(Y))
-#define RIII(X, Y, Z) scanf("%d%d%d", &(X), &(Y), &(Z))
-#define DRI(X) int (X); scanf("%d", &X)
-#define DRII(X, Y) int X, Y; scanf("%d%d", &X, &Y)
-#define DRIII(X, Y, Z) int X, Y, Z; scanf("%d%d%d", &X, &Y, &Z)
-#define RS(X) scanf("%s", (X))
-#define CASET int ___T, case_n = 1; scanf("%d ", &___T); while (___T-- > 0)
-#define MP make_pair
-#define PB push_back
-#define MS0(X) memset((X), 0, sizeof((X)))
-#define MS1(X) memset((X), -1, sizeof((X)))
-#define LEN(X) strlen(X)
-#define F first
-#define S second
-#define PII pair<int,int>
-#define VPII vector<PII>
-typedef long long LL;
+#include <stdio.h>
+#include <string.h>
+#include <iostream>
+#include <algorithm>
+#include <vector>
+#include <queue>
+#include <set>
+#include <map>
+#include <string>
+#include <math.h>
+#include <stdlib.h>
+#include <time.h>
+#include <iomanip>
 using namespace std;
-const int MOD = 998244353;
-const int SIZE = 1010;
-int tran[SIZE][8];
-PII bfs[SIZE*SIZE];
-int tt,used[SIZE][SIZE];
-int two[SIZE];
-VPII e[SIZE][SIZE];
-struct Union_Find{
-    int d[SIZE*SIZE],num[SIZE*SIZE];
-    void init(int n){
-        REP(i,n)d[i]=i,num[i]=1;
+typedef long long ll;
+
+const ll mod=998244353;
+bool a[1000][1000];
+int n,m,au[1000][9],p[1000][1000],ee,fa[900],num[900];
+ll two[1000];
+
+struct edge {
+    int x,y,next;
+}e[8888888];
+
+void addedge(int x,int y,int u,int v) {
+    // (u,v) -> (x,y)
+    if(x==y) 
+        return;
+    if(x>y) {
+        x=x^y;
+        y=x^y;
+        x=x^y;
     }
-    int find(int x){
-        return (x!=d[x])?(d[x]=find(d[x])):x;
+    e[ee].x=u;
+    e[ee].y=v;
+    e[ee].next=p[x][y];
+    p[x][y]=ee++;
+}
+
+void init() {
+    int i,j,k,x,y;
+    queue<int> qx,qy;
+    ee=0;
+    for(i=1;i<=n;i++) {
+        fa[i]=i;
+        num[i]=1;
     }
-    bool uu(int x,int y){
-        x=find(x);
-        y=find(y);
-        if(x==y)return 0;
-        if(num[x]<=num[y]){
-            num[y]+=num[x];
-            d[x]=y;
+    for(i=1;i<n;i++)
+        for(j=i+1;j<=n;j++)
+            for(k=1;k<=m;k++)
+                // (i,j) -> (au[i][k],au[j][k])
+                addedge(au[i][k],au[j][k],i,j);
+    for(i=1;i<=n;i++) {
+        a[0][i]=true;
+        qx.push(0);
+        qy.push(i);
+    }
+    while (!qx.empty()) {
+        i=qx.front();
+        j=qy.front();
+        qx.pop();
+        qy.pop();
+        k=p[i][j];
+        while(k!=-1) {
+            // (x,y)->(i,j)
+            x=e[k].x;
+            y=e[k].y;
+            if(a[x][y]) {
+                k=e[k].next;
+                continue;
+            } else {
+                // a[i][j]: whether <i,j> is YJC set
+                a[x][y]=true;
+                qx.push(e[k].x);
+                qy.push(e[k].y);
+            }
         }
-        else{
-            num[x]+=num[y];
-            d[y]=x;
-        }
-        return 1;
     }
-}U;
-// all (i,j) YJC set or not
-// find equivalent set P_i
-int main(){
+}
+
+int find_fa(int u) {
+    if(u==fa[u]) return u;
+    return fa[u]=find_fa(fa[u]);
+}
+
+ll cal () {
+    int i,j;
+    ll ans=two[n]-1;
+    for(i=1;i<n;i++) 
+        for(j=i+1;j<=n;j++) {
+            // <i,j> is not YJC set
+            if(!a[i][j]&&find_fa(i)!=find_fa(j)) {
+                num[find_fa(i)]+=num[find_fa(j)];
+                fa[fa[j]]=fa[i];
+            }
+    }
+    for(i=1;i<=n;i++) {
+        if(i==fa[i]) {
+            ans=(ans+mod-two[num[i]]+1)%mod;
+        }
+    }
+    return ans;
+}
+
+int main () 
+{
+    int i,j;
     two[0]=1;
-    REPP(i,1,SIZE)two[i]=two[i-1]*2%MOD;
-    int n,m;
-    while(RII(n,m)==2){
-        tt++;
-        REPP(i,1,n+1){
-            REP(j,m)RI(tran[i][j]);
-        }
-        U.init((n+1)*(n+1));
-        REP(i,n+1)REP(j,n+1)e[i][j].clear();
-        REP(y1,n+1)REP(x1,y1){
-            REP(i,m){
-                int x2=tran[x1][i];
-                int y2=tran[y1][i];
-                if(x2>y2)swap(x2,y2);
-                e[x2][y2].PB(MP(x1,y1));
-            }
-        }
-        int ll=0,rr=0;
-        REPP(i,1,n+1){
-            used[0][i]++;
-            bfs[rr++]=MP(0,i);
-        }
-        while(ll<rr){
-            int x=bfs[ll].F;
-            int y=bfs[ll].S;
-            REP(i,SZ(e[x][y])){
-                int x2=e[x][y][i].F;
-                int y2=e[x][y][i].S;
-                if(used[x2][y2]!=tt){
-                    used[x2][y2]=tt;
-                    bfs[rr++]=MP(x2,y2);
-                }
-            }
-            ll++;
-        }
-        REPP(y,1,n+1)REPP(x,1,y){
-            if(used[x][y]!=tt)U.uu(x,y);
-        }
-        LL an=two[n]-n-1;
-        REPP(i,1,n+1){
-            if(U.find(i)==i){
-                if(U.num[i]>1){
-                    an-=two[U.num[i]]-U.num[i]-1;
-                }
-            }
-        }
-        an%=MOD;
-        if(an<0)an+=MOD;
-        cout<<an<<endl;
+    for(i=1;i<=900;i++) 
+        two[i]=2*two[i-1]%mod;
+    while(~scanf("%d%d",&n,&m)) {
+        for(i=1;i<=n;i++) 
+            for(j=1;j<=m;j++) 
+                scanf("%d",&au[i][j]);
+        memset(a,false,sizeof(a));
+        for(i=0;i<n;i++) 
+            for(j=i+1;j<=n;j++) 
+                p[i][j]=-1;
+        init();
+        printf("%I64d\n",cal());
     }
-    return 0;
 }
