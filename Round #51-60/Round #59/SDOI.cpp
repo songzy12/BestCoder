@@ -34,8 +34,11 @@ int main(){
 		cout<<"The member list of Shandong team is as follows:"<<endl;
 		cin>>n>>m;
 		int max1 = 0, max2 = 0;
+        bool have = false;
 		for(int i = 0; i < n; ++i){
 			cin>>student[i].name>>student[i].sex>>student[i].round1>>student[i].round2;
+            if (student[i].sex[0] == 'f')
+                have = true;
 			if(student[i].round1 > max1)
 				max1 = student[i].round1;
 			if(student[i].round2 > max2)
@@ -44,7 +47,8 @@ int main(){
 		for(int i = 0; i < n; ++i)
 			student[i].total = student[i].round1*300*0.3/max1 + student[i].round2*300*0.7/max2;
 		sort(student, student+n, cmp);
-		bool found = false;
+		
+        bool found = false;
 		int i = 0;
 		while(i < m-1){
 			cout<<student[i].name<<endl;
@@ -52,7 +56,7 @@ int main(){
 				found = true;
 			i++;
 		}
-		if(found)
+		if(!have || found)
 			cout<<student[i].name<<endl;
 		else{
 			while(i < n && student[i].sex[0] != 'f')

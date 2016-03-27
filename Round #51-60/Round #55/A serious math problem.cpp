@@ -39,7 +39,7 @@ int main()
 {
     Init();
     int t, tt=0; 
-	cin>>t;
+	scanf("%d", &t);
 	while (tt++<t)
     {
         char ch=0; al=bl=0; clr(a,0); clr(b,0);
