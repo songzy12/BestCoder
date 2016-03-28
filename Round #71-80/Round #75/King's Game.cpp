@@ -4,6 +4,14 @@
 #include<cmath>
 #include<algorithm>
 using namespace std;
+
+/*
+f[i][j]: i people left, starting from j.
+f[1][j] = 0;
+f[i][j] = (f[i-1][j+1] + j) mod i
+f[n][1] + 1 (shift the index to [1, n])
+*/
+
 const int N = 5050;
 int n,m;
 int dp[N];
